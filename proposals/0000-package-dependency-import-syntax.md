@@ -1,28 +1,20 @@
 # Inline package dependency import syntax
 
 * Proposal: [SE-NNNN](NNNN-filename.md)
-* Authors: [Rahul Malik](https://github.com/rahul-malik), [Ankit Aggarwal](https://github.com/aciidb0mb3r)
+* Authors: [Rahul Malik](https://github.com/rahul-malik), [Ankit Aggarwal](https://github.com/aciidb0mb3r), [David Hart](https://github.com/hartbit)
 * Review Manager: TBD
 * Status: **Awaiting implementation**
 
-*During the review process, add the following fields as needed:*
-
-* Implementation: [apple/swift-package-manager#NNNNN](https://github.com/apple/swift-package-manager/pull/NNNNN)
-* Decision Notes: [Rationale](https://forums.swift.org/), [Additional Commentary](https://forums.swift.org/)
-* Bugs: [SR-NNNN](https://bugs.swift.org/browse/SR-NNNN), [SR-MMMM](https://bugs.swift.org/browse/SR-MMMM)
-* Previous Revision: [1](https://github.com/apple/swift-evolution/blob/...commit-ID.../proposals/NNNN-filename.md)
-* Previous Proposal: [SE-XXXX](XXXX-filename.md)
-
 ## Introduction
 
-Developers today are using Swift as a scripting language to utilize its language features and portability across macOS and Linux. Compared to other common scripting languages (Python, Ruby, etc.), Swift maintains a "batteries-not-included" approaches and relies on external packages to provide functionality like command-line argument parsing that are common in scripts. This proposal focuses on a new syntax for importing package dependencies directly within scripts written in Swift. When writing a script in Swift, you could specify package dependencies with the same level of specificity offered by the current Package manifest schema.
+Developers today are using Swift as a scripting language to utilize its language features and portability across macOS and Linux. Compared to other common scripting languages (Python, Ruby, etc.), Swift maintains a "batteries-not-included" approach and relies on external packages to provide functionality like command-line argument parsing that are common in scripts. This proposal focuses on a new syntax for importing package dependencies directly within scripts written in Swift with the same level of specificity offered by the current Package manifest schema.
 
 Swift-evolution thread: [Discussion thread topic for that
 proposal](https://forums.swift.org/)
 
 ## Motivation
 
-Writing scripts in Swift currently requires more work than other languages. The community has filled many of the gaps in terms of functionality like command-line argument parsing but even utilizing these packages can be significantly more friction.
+Writing scripts in Swift currently requires more work than other languages. The community has filled many of the gaps in terms of functionality like command-line argument parsing but even utilizing these packages can add significantly more friction.
 
 The community has also tried to solve this problem themselves through projects like [Marathon](http://github.com/johnsundell/marathon) and [swift-sh](http://github.com/mxcl/swift-sh) to provide functionality like resolving and fetching dependencies which are available within SwiftPM today.
 There are drawbacks to this solution
@@ -36,7 +28,7 @@ This proposal would dramatically improve the developer experience for writing sc
 
 Improving dependency management and portabilty of scripts requires declaring dependencies within the script itself. We would implement a new import syntax for external packages. These external packages can be referenced using the `@package(url: ....)` annotation to specify the package location and version requirements.
 
-```
+```swift
 // MyScript.swift
 import Foundation
 import UIKit
@@ -53,7 +45,7 @@ The `@package(...)` syntax will contain the same level of control and specificit
 
 #### Basic usage
 The most common case is expected to be importing a dependency where the product name is equivalent to the imported module name.
-```
+```swift
 import Foundation
 import UIKit
 @package(url: "http://github.com/author/example.git") import Example
@@ -64,33 +56,33 @@ import UIKit
 The `@package(..)` annotation would also allow a developer to specify requirements to ensure your scripts are reproducible. The syntax will contain the same level of control and specificity as `PackageDependencyDescription.Requirement` which should feel like a natural to developers familiar with Swift Package Manager manifest syntax.  
 
 *Revision*
-```
+```swift
 @package(url: "http://github.com/author/example.git", .revision( "065675b3d1364a6f63b94a9c89be2e9ed0a4c3a1")) import Example
 ```
 
 *Branch*
-```
+```swift
 @package(url: "http://github.com/author/example.git", .branch("releases/1.0")) import Example
 ```
 
 *Exact Version*
-```
+```swift
 @package(url: "http://github.com/author/example.git", .exact("1.0")) import Example
 ```
 
 *Range of version*
-```
+```swift
 @package(url: "http://github.com/author/example.git", .from("1.0")) import Example
 ```
 
 *Local dependency*
 Absolute path
-```
+```swift
 @package(path: "/Users/author/example") import Example
 ```
 
 Relative path
-```
+```swift
 @package(path: "my_project/internal_package") import Example
 ```
 
@@ -101,7 +93,7 @@ Package dependencies automatically make their transitive package dependencies av
 For an example, lets look at the Package description below for our example dependency and transitive dependency.
 
 Direct dependency
-```
+```swift
 let package = Package(
     name: "Example",
     products: [
@@ -114,7 +106,7 @@ let package = Package(
 ```
 
 Transitive dependency
-```
+```swift
 let package = Package(
     name: "TransitiveDependency",
     products: [
@@ -125,7 +117,7 @@ let package = Package(
 ```
 
 With the above Package descriptions, we can import transitive dependencies by explicitly exporting them in the package attribute definition.
-```
+```swift
 import Foundation
 import UIKit
 @package(url: "http://github.com/author/example", products: ["TransitiveDependency"]) import Example 

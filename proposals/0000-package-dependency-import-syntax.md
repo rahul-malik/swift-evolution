@@ -7,23 +7,22 @@
 
 ## Introduction
 
-Swift is a general-purpose language that aims expand it's availability and impact on various domains and platforms. We believe great scripting support and experience is an important part of improving the impact of Swift as a language. Swift already includes basic support for scripting via swift command-line tool. This is a proposal for greatly improving the script support by providing a deeper integration with the Swift Package Manager.
-
+Swift is a general-purpose language that aims expand it's availability and impact on various domains and platforms. We believe great scripting support and experience is an important part of improving the impact of Swift as a language. Swift already includes basic support for scripting via the Swift command-line tool. This is a proposal for greatly improving the script support by providing a deeper integration with the Swift Package Manager.
 
 Swift-evolution thread: [Discussion thread topic for that
 proposal](https://forums.swift.org/)
 
 ## Motivation
 
-Swift standard library maintains a "batteries-not-included" approach and relies on external packages to provide more functionality. However, this introduces friction in writing Swift scripts as there's no easy way to reference external packages from a single file. For example, there's no way to easily include basic scripting utilities like a command-line argument parsing library.
+The Swift standard library maintains a "batteries-not-included" approach and relies on external packages to provide more functionality. However, this introduces friction in writing Swift scripts as there's no easy way to reference external packages from a single file. For example, there's no way to easily include basic scripting utilities like a command-line argument parsing library.
 
-The Swift community has also recognized and tried to provide better scripting support through projects like Marathon and swift-sh. These projects leverage the Swift Package Manager to fetch and build external packages referenced in a Swift script. We believe we can take this approach further and provide a much better scripting experience by improving the integration between the Swift language and the Swift Package Manager. This will also allow Swift users to easily share their scripts without requiring to install additional tooling.
+The Swift community has also recognized and tried to provide better scripting support through projects like [Marathon](http://github.com/johnsundell/marathon) and [swift-sh](http://github.com/mxcl/swift-sh). These projects leverage the Swift Package Manager to fetch and build external packages referenced in a Swift script. We believe we can take this approach further and provide a much better scripting experience by improving the integration between the Swift language and the Swift Package Manager. This will also allow Swift users to easily share their scripts without requiring to install additional tooling.
 
 This proposal would dramatically improve the developer experience for writing scripts in Swift. Dependencies for common use-cases would be easy to integrate and scripts would be portable across machines without additional tools installed on the host machine. 
 
 ## Proposed solution
 
-We propose to add a new attribute @package to the import statement for referencing Swift packages. This attribute would be only valid in Swift script file and will be rejected if used during compilation of a regular Swift module. Swift Package Manager will then fetch and build the declared packages and make them available to the script when executing it.
+We propose to add a new attribute @package to the import statement for referencing Swift packages. This attribute would be only valid when running in the Swift interpreter (via `swift MyScript.swift` or `swift run MyScript.swift`) and will be rejected if used during compilation of a regular Swift module. Swift Package Manager will then fetch and build the declared packages and make them available to the script when executing it.
 
 ```
 import Foundation
@@ -32,9 +31,9 @@ import Foundation
 import Yams
 ```
 
-This script can be executable by using `swift run MyScript.swift` which will utilize Swift package managers dependency fetching and resolution logic.
+This script can be executable by either `swift MyScript.swift` or `swift run MyScript.swift` which will utilize Swift package managers dependency fetching and resolution logic.
 
-The `@package(...)` syntax will contain the same level of control and specificity as SwiftPM current [Package Dependency Description](https://docs.swift.org/package-manager/PackageDescription/PackageDescription.html#package-dependency) which should feel like a natural to developers familiar with Swift Package Manager manifest syntax.  
+The `@package(...)`syntax will allow the same parameters as SwiftPM's [Package Dependency Description](https://docs.swift.org/package-manager/PackageDescription/PackageDescription.html#package-dependency) which should feel natural to developers familiar with Swift Package Manager manifest syntax.  
 
 ## Detailed design
 
@@ -43,7 +42,6 @@ The `@package(...)` syntax will contain the same level of control and specificit
 The most common case is expected to be importing a dependency where the product name is equivalent to the imported module name.
 ```swift
 import Foundation
-
 @package(url: "http://github.com/author/example.git") import Example
 ```
 
@@ -53,33 +51,39 @@ The `@package(..)` annotation would also allow a developer to specify requiremen
 
 *Revision*
 ```swift
-@package(url: "http://github.com/author/example.git", .revision( "065675b3d1364a6f63b94a9c89be2e9ed0a4c3a1")) import Example
+@package(url: "http://github.com/author/example.git", .revision( "065675b3d1364a6f63b94a9c89be2e9ed0a4c3a1")) 
+import Example
 ```
 
 *Branch*
 ```swift
-@package(url: "http://github.com/author/example.git", .branch("releases/1.0")) import Example
+@package(url: "http://github.com/author/example.git", .branch("releases/1.0")) 
+import Example
 ```
 
 *Exact Version*
 ```swift
-@package(url: "http://github.com/author/example.git", .exact("1.0")) import Example
+@package(url: "http://github.com/author/example.git", .exact("1.0")) 
+import Example
 ```
 
 *Range of version*
 ```swift
-@package(url: "http://github.com/author/example.git", .from("1.0")) import Example
+@package(url: "http://github.com/author/example.git", .from("1.0")) 
+import Example
 ```
 
 *Local dependency*
 Absolute path
 ```swift
-@package(path: "/Users/author/example") import Example
+@package(path: "/Users/author/example") 
+import Example
 ```
 
 Relative path
 ```swift
-@package(path: "my_project/internal_package") import Example
+@package(path: "my_project/internal_package") 
+import Example
 ```
 
 #### Transitive dependencies 
@@ -140,10 +144,6 @@ The name of the resolved file will be `script_name.resolved`.
 TBD
 
 
-## Security
-
-TBD
-
 ## Impact on exisiting packages
 
 This change will not affect existing packages
@@ -151,4 +151,6 @@ This change will not affect existing packages
 
 ## Alternatives considered
 
-TBD
+### Global package dependencies
+
+One alternative could be adding a feature to globally install packages that can be referenced by any script. This is usually a bad idea because it negatively affects the portability of our scripts.

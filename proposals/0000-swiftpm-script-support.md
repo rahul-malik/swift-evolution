@@ -91,7 +91,7 @@ import Yams
 
 *Range of version*
 ```swift
-@package(url: "https://github.com/jpsim/Yams.git", .from("1.0")) 
+@package(url: "https://github.com/jpsim/Yams.git", .from("1.0.0")) 
 import Yams 
 ```
 

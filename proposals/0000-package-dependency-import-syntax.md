@@ -65,7 +65,7 @@ let package = Package(
             name: "TSCTestSupportExecutable",
             targets: ["TSCTestSupportExecutable"]),
     ],
-    .....
+    // Rest of Package.swift truncated for brevity .....
 }
 ```
 
@@ -117,7 +117,6 @@ Relative path
 import Yams 
 ```
 
-
 ### Integration with Swift Compiler 
 
 The `@package()` syntax will need to be added to the AST definition and compiler front-end will require changes to parse this syntax.
@@ -125,14 +124,19 @@ The `@package()` syntax will need to be added to the AST definition and compiler
 ### Integration with SwiftPM
 
 #### Execution
-Scripts that utilize the `@package()` attribute will be executed by `swift run` and managed by Swift package manager.
+Scripts that utilize the `@package()` attribute can be executed by `swift run` and managed by Swift package manager.
 
 Swift package manager will utilize the changes to the compiler front-end to access packages referenced using the `@package` attribute.
 
 #### Package resolution 
+
 Once package dependencies are known, SwiftPM will use it's existing logic for resolving those dependencies and outputting a ".resolved" file to ensure future invocations are reproducible.
 
 The name of the resolved file will be `script_name.resolved`.
+
+#### Built products
+
+Products built from scripts will be located in common per-user location `~/.swiftpm/scripts/...`
 
 ### Integration with SourceKit-LSP 
 

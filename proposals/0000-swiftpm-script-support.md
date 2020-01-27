@@ -1,4 +1,4 @@
-# Inline package dependency import syntax
+# SwiftPM support for Swift scripts
 
 * Proposal: [SE-NNNN](NNNN-filename.md)
 * Authors: [Rahul Malik](https://github.com/rahul-malik), [Ankit Aggarwal](https://github.com/aciidb0mb3r), [David Hart](https://github.com/hartbit)
@@ -29,7 +29,7 @@ We propose to add a new attribute @package to the import statement for referenci
 import Yams
 ```
 
-This script can be executable by either `swift MyScript.swift` or `swift run MyScript.swift` which will utilize Swift package managers dependency fetching and resolution logic.
+This script can be executable by either `swift MyScript.swift` or `swift run MyScript.swift` which will utilize SwiftPM's dependency fetching and resolution logic.
 
 The `@package(...)`syntax will allow the same parameters as SwiftPM's [Package Dependency Description](https://docs.swift.org/package-manager/PackageDescription/PackageDescription.html#package-dependency) which should feel natural to developers familiar with Swift Package Manager manifest syntax.  
 
@@ -54,16 +54,6 @@ let package = Package(
             name: "SwiftToolsSupport",
             type: .dynamic,
             targets: ["TSCBasic", "TSCUtility"]),
-        .library(
-            name: "SwiftToolsSupport-auto",
-            targets: ["TSCBasic", "TSCUtility"]),
-
-        .library(
-            name: "TSCTestSupport",
-            targets: ["TSCTestSupport"]),
-        .executable(
-            name: "TSCTestSupportExecutable",
-            targets: ["TSCTestSupportExecutable"]),
     ],
     // Rest of Package.swift truncated for brevity .....
 }
@@ -72,8 +62,9 @@ let package = Package(
 With the above Package descriptions, the `SwiftToolsSupport` product does not match a target within the package description it must be specified explicitly.
 
 ```swift
-@package(url: "https://github.com/apple/swift-tools-support-core.git", products: ["SwiftToolsSupport"]) 
-import SwiftToolsSupport 
+@package(url: "https://github.com/apple/swift-tools-support-core.git", .exact("0.0.1"), products: ["SwiftToolsSupport"])
+import TSCBasic 
+
 ```
 
 #### Dependency version requirements
@@ -82,7 +73,7 @@ The `@package(..)` annotation would also allow a developer to specify requiremen
 
 *Revision*
 ```swift
-@package(url: "https://github.com/jpsim/Yams.git", .revision( "065675b3d1364a6f63b94a9c89be2e9ed0a4c3a1")) 
+@package(url: "https://github.com/jpsim/Yams.git", .revision("5fa313eae1ca127ad3c706e14c564399989cb1b1")) 
 import Yams 
 ```
 
@@ -94,7 +85,7 @@ import Yams
 
 *Exact Version*
 ```swift
-@package(url: "https://github.com/jpsim/Yams.git", .exact("1.0")) 
+@package(url: "https://github.com/jpsim/Yams.git", .exact("2.0.0")) 
 import Yams 
 ```
 
@@ -124,9 +115,9 @@ The `@package()` syntax will need to be added to the AST definition and compiler
 ### Integration with SwiftPM
 
 #### Execution
-Scripts that utilize the `@package()` attribute can be executed by `swift run` and managed by Swift package manager.
+Scripts that utilize the `@package()` attribute can be executed by `swift run` and managed by SwiftPM.
 
-Swift package manager will utilize the changes to the compiler front-end to access packages referenced using the `@package` attribute.
+SwiftPM will utilize the changes to the compiler front-end to access packages referenced using the `@package` attribute.
 
 #### Package resolution 
 
@@ -137,11 +128,6 @@ The name of the resolved file will be `script_name.resolved`.
 #### Built products
 
 Products built from scripts will be located in common per-user location `~/.swiftpm/scripts/...`
-
-### Integration with SourceKit-LSP 
-
-TBD
-
 
 ## Impact on exisiting packages
 

@@ -22,7 +22,7 @@ This proposal would dramatically improve the developer experience for writing sc
 
 ## Proposed solution
 
-We propose to add a new attribute @package to the import statement for referencing Swift packages. This attribute would be only valid when running in the Swift interpreter (via `swift MyScript.swift` or `swift run MyScript.swift`) and will be rejected if used during compilation of a regular Swift module. Swift Package Manager will then fetch and build the declared packages and make them available to the script when executing it.
+We propose to add a new attribute `@package` to import statements for referencing Swift packages. This attribute would be only valid when running in the Swift interpreter (via `swift MyScript.swift` or `swift run MyScript.swift`) and will be rejected if used during compilation of a regular Swift module. Swift Package Manager will then fetch and build the declared packages and make them available to the script when executing it.
 
 ```swift
 @package(url: "https://github.com/jpsim/Yams.git", from: "2.0.0")
@@ -59,7 +59,7 @@ let package = Package(
 }
 ```
 
-With the above Package descriptions, the `SwiftToolsSupport` product does not match a target within the package description it must be specified explicitly.
+With the above package description, the `SwiftToolsSupport` product does not match a target within the package description so it must be specified explicitly.
 
 ```swift
 @package(url: "https://github.com/apple/swift-tools-support-core.git", .exact("0.0.1"), products: ["SwiftToolsSupport"])
@@ -128,11 +128,6 @@ The name of the resolved file will be `script_name.resolved`.
 #### Built products
 
 Products built from scripts will be located in common per-user location `~/.swiftpm/scripts/...`
-
-## Impact on exisiting packages
-
-This change will not affect existing packages
-
 
 ## Alternatives considered
 

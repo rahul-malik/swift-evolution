@@ -82,39 +82,39 @@ The `@package(..)` annotation would also allow a developer to specify requiremen
 
 *Revision*
 ```swift
-@package(url: "http://github.com/author/example.git", .revision( "065675b3d1364a6f63b94a9c89be2e9ed0a4c3a1")) 
-import Example
+@package(url: "https://github.com/jpsim/Yams.git", .revision( "065675b3d1364a6f63b94a9c89be2e9ed0a4c3a1")) 
+import Yams 
 ```
 
 *Branch*
 ```swift
-@package(url: "http://github.com/author/example.git", .branch("releases/1.0")) 
-import Example
+@package(url: "https://github.com/jpsim/Yams.git", .branch("releases/1.0")) 
+import Yams 
 ```
 
 *Exact Version*
 ```swift
-@package(url: "http://github.com/author/example.git", .exact("1.0")) 
-import Example
+@package(url: "https://github.com/jpsim/Yams.git", .exact("1.0")) 
+import Yams 
 ```
 
 *Range of version*
 ```swift
-@package(url: "http://github.com/author/example.git", .from("1.0")) 
-import Example
+@package(url: "https://github.com/jpsim/Yams.git", .from("1.0")) 
+import Yams 
 ```
 
 *Local dependency*
 Absolute path
 ```swift
-@package(path: "/Users/author/example") 
-import Example
+@package(path: "/Users/username/Yams") 
+import Yams 
 ```
 
 Relative path
 ```swift
-@package(path: "my_project/internal_package") 
-import Example
+@package(path: "dependencies/Yams") 
+import Yams 
 ```
 
 

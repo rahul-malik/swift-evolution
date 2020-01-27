@@ -24,9 +24,7 @@ This proposal would dramatically improve the developer experience for writing sc
 
 We propose to add a new attribute @package to the import statement for referencing Swift packages. This attribute would be only valid when running in the Swift interpreter (via `swift MyScript.swift` or `swift run MyScript.swift`) and will be rejected if used during compilation of a regular Swift module. Swift Package Manager will then fetch and build the declared packages and make them available to the script when executing it.
 
-```
-import Foundation
-
+```swift
 @package(url: "https://github.com/jpsim/Yams.git", from: "2.0.0")
 import Yams
 ```
@@ -41,8 +39,41 @@ The `@package(...)`syntax will allow the same parameters as SwiftPM's [Package D
 #### Basic usage
 The most common case is expected to be importing a dependency where the product name is equivalent to the imported module name.
 ```swift
-import Foundation
-@package(url: "http://github.com/author/example.git") import Example
+@package(url: "https://github.com/jpsim/Yams.git", from: "2.0.0")
+import Yams
+```
+
+When a dependency product and target names do not match, the product must be explicitly specified.
+
+For an example, lets look at the Package description below for `swift-tools-support-core`. 
+```swift
+let package = Package(
+    name: "swift-tools-support-core",
+    products: [
+        .library(
+            name: "SwiftToolsSupport",
+            type: .dynamic,
+            targets: ["TSCBasic", "TSCUtility"]),
+        .library(
+            name: "SwiftToolsSupport-auto",
+            targets: ["TSCBasic", "TSCUtility"]),
+
+        .library(
+            name: "TSCTestSupport",
+            targets: ["TSCTestSupport"]),
+        .executable(
+            name: "TSCTestSupportExecutable",
+            targets: ["TSCTestSupportExecutable"]),
+    ],
+    .....
+}
+```
+
+With the above Package descriptions, the `SwiftToolsSupport` product does not match a target within the package description it must be specified explicitly.
+
+```swift
+@package(url: "https://github.com/apple/swift-tools-support-core.git", products: ["SwiftToolsSupport"]) 
+import SwiftToolsSupport 
 ```
 
 #### Dependency version requirements
@@ -86,42 +117,6 @@ Relative path
 import Example
 ```
 
-#### Transitive dependencies 
-
-Package dependencies automatically make their transitive package dependencies available for use.
-
-For an example, lets look at the Package description below for our example dependency and transitive dependency.
-
-Direct dependency
-```swift
-let package = Package(
-    name: "Example",
-    products: [
-        .library(name: "example", targets: ["Example"]),
-    ],
-    dependencies: [
-        .package(url: "https://github.com/another_author/TransitiveDependency.git", from: "1.0.0"),
-    ],
-)
-```
-
-Transitive dependency
-```swift
-let package = Package(
-    name: "TransitiveDependency",
-    products: [
-        .library(name: "TransitiveDependency", targets: ["TransitiveDependency"]),
-    ],
-    dependencies: [],
-)
-```
-
-With the above Package descriptions, we can import transitive dependencies by explicitly exporting them in the package attribute definition.
-```swift
-import Foundation
-@package(url: "http://github.com/author/example", products: ["TransitiveDependency"]) import Example 
-import TransitiveDependency 
-```
 
 ### Integration with Swift Compiler 
 

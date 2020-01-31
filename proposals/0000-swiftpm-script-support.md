@@ -142,7 +142,7 @@ Products built from scripts will be located in common per-user location `~/.swif
 
 #### Shared local dependency cache
 
-Dependencies will be stored and managed by a local dependency cache which will allow scripts to avoid over-fetching
+Dependencies will be stored and managed by a local dependency cache which will allow scripts to reuse any dependencies that have already been fetched. 
 
 
 ## Alternatives considered

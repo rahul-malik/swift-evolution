@@ -38,8 +38,10 @@ The `@package(...)`syntax will allow the same parameters as SwiftPM's [Package D
 
 #### Basic usage
 The most common case is expected to be importing a dependency where the product name is equivalent to the imported module name.
+
+Specifying the version of the package is optional. If omitted, SwiftPM will resolve the latest version of the dependency.
 ```swift
-@package(url: "https://github.com/jpsim/Yams.git", from: "2.0.0")
+@package(url: "https://github.com/jpsim/Yams.git")
 import Yams
 ```
 
@@ -123,11 +125,25 @@ SwiftPM will utilize the changes to the compiler front-end to access packages re
 
 Once package dependencies are known, SwiftPM will use it's existing logic for resolving those dependencies and outputting a ".resolved" file to ensure future invocations are reproducible.
 
-The name of the resolved file will be `script_name.resolved`.
+The name of the resolved file will be `script_name.resolved`. By default, the resolve file will be located under `~/.swiftpm/scripts` but can be specified to another path if desired.
+
+#### Updating package dependencies
+
+Dependencies of scripts can be updated to their latest version by executing `swift package update <script-name>`. 
+
+
+#### Converting a script to a Package
+
+SwiftPM will have new support for transforming a script to a package by extracting the information specified in `@package(...)` declarations.  
 
 #### Built products
 
 Products built from scripts will be located in common per-user location `~/.swiftpm/scripts/...`
+
+#### Shared local dependency cache
+
+Dependencies will be stored and managed by a local dependency cache which will allow scripts to avoid over-fetching
+
 
 ## Alternatives considered
 

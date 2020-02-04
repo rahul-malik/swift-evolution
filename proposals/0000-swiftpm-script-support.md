@@ -125,7 +125,7 @@ SwiftPM will utilize the changes to the compiler front-end to access packages re
 
 Once package dependencies are known, SwiftPM will use it's existing logic for resolving those dependencies and outputting a ".resolved" file to ensure future invocations are reproducible.
 
-The name of the resolved file will be `script_name.resolved`. By default, the resolve file will be located under `~/.swiftpm/scripts` but can be specified to another path if desired.
+The name of the resolved file will be `script_name.resolved`. By default, the resolve file will be located under `~/Library/Developer/swiftpm/scripts` but can be specified to another path if desired.
 
 #### Updating package dependencies
 
@@ -138,15 +138,19 @@ SwiftPM will have new support for transforming a script to a package by extracti
 
 #### Built products
 
-Products built from scripts will be located in common per-user location `~/.swiftpm/scripts/...`
+Products built from scripts will be located in common per-user location `~/Library/Developer/swiftpm/scripts/...`
 
 #### Shared local dependency cache
 
-Dependencies will be stored and managed by a local dependency cache which will allow scripts to reuse any dependencies that have already been fetched. 
-
+It's quite common to use similar set of dependencies across many packages and scripts. Given that, shared dependency cache for dependency's sources is important for both packages and scripts to avoid performing unnecessary fetching operations. This proposal will make it very easy to spin up Swift scripts that share a lot of dependencies so it's important to implement the shared dependency cache in parallel with this proposal.
 
 ## Alternatives considered
 
 ### Global package dependencies
 
 One alternative could be adding a feature to globally install packages that can be referenced by any script. This is usually a bad idea because it negatively affects the portability of our scripts.
+
+### Explicit version requirements
+
+This proposal originally stated that it was required to specify a version in the package attribute declaration. Due to the nature of scripts as short-lived programs, developers prefer to default to the latest version. For this reason we've removed any version requirements from this proposal.
+
